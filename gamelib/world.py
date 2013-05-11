@@ -8,8 +8,6 @@ import level
 import leveldata
 from const import *
 from pygame.locals import *
-#import leveldatatest
-#leveldata = leveldatatest
 
 class Worldloop(object):
     """Simple class for looping through worlds"""
@@ -38,11 +36,10 @@ class World(object):
         self.board = game.board
         self.worldnum = worldnum
 
-        # colors for the circles
+        # colors for drawing the 'portals'
         # triangle color
         self.tcol = (255,255,255)
         # outer and inner circle colors
-
         if worldnum == 2:
             self.outercol = (0,255,0)
             self.innercol = (0,112,0)
@@ -78,7 +75,6 @@ class World(object):
         if self.worldnum == self.game.nworlds:
             self.alllevels = self.getbonuslevels()
             self.numlevels = len(self.alllevels)
-
         else:
             self.alllevels = leveldata.LEVELS[str(worldnum)]
             self.numlevels = len(self.alllevels)
@@ -98,18 +94,19 @@ class World(object):
     def getbonuslevels(self):
         """Return random selection of bonus levels"""
         import leveldatabonus
-        # 3 easy levels, 4 mid levels, 3 hard levels
+        # choose 3 easy levels, 4 mid levels, 3 hard levels
+        # note there are 100 easy, 100 mid, 100 hard in total
         nlevs = len(leveldatabonus.LEVELS['bonus'])
         e1,e2,e3 = (randint(0,99),randint(0,99),randint(0,99))
-        m1,m2,m3,m4 = (randint(0,99),randint(100,199),
+        m1,m2,m3,m4 = (randint(100,199),randint(100,199),
                        randint(100,199),randint(100,199))
         h1,h2,h3 = (randint(200,299),randint(200,299),randint(200,299))
-        # screenshot is level 290
         levels = [leveldatabonus.LEVELS['bonus'][i] for i in
                   [e1,e2,e3,m1,m2,m3,m4,h1,h2,h3]]
         return levels
 
     def drawintro(self):
+        """Screen to introduce galaxy"""
         if self.worldnum == self.game.nworlds:
             text = 'BONUS'
         else:
@@ -121,18 +118,20 @@ class World(object):
         pygame.time.wait(2000)
         # start the music!
         pygame.mixer.music.play(-1)                   
-                    
 
     def playworld(self):
+        """Play this world (galaxy)"""
         # draw world screen e.g. "Galaxy 1"
         self.drawintro()
         while self.levelnum != self.numlevels:
             self.nextlevel()
 
     def nextlevel(self):
+        """Play the next level"""
         self.board.clear()
         title = ('level ' + str(self.levelnum + 1) + '/'
                  + str(self.numlevels))
+        # play it
         self.level = level.Level(self.game,self, title,
                                  self.alllevels[self.levelnum])
         # if here, we completed the level

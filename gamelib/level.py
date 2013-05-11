@@ -11,16 +11,20 @@ class Level(object):
         self.world = world
         self.title = title
         self.ispaused = False
-        
+
+        # cells is the main data structure
         # each level has dictionary of cells
         # keys are location e.g. '11', '21'
-        # where first number is xpos on board, second ypos
+        # where first number is xpos on board, second is ypos
         # values are cell objects
         self.cells = self.createcells(ldata)
 
+        # store the state
         self.cellclicked = None
         self.drawlevel()
         self.loop()
+
+        # execution returns to world.nextlevel (see world.py)
 
     def createcells(self,ldata):
         """Create list of cell objects in level"""
@@ -31,17 +35,14 @@ class Level(object):
         for c in clist:
             d[str(c.xpos)+str(c.ypos)] = c
         return d
-
-    def createcellkeys(self):
-        d = {}
-        for cell in self.cells:
-            d[str(cell.xpos)+str(cell.ypos)] = None
-        return d
             
     def drawlevel(self):
+        # draw background image
         self.screen.blit(self.game.bim,(0,0))
+        # draw cells ('portals')
         for cell in self.cells.values():
             self.board.drawcell(cell)
+        # draw the 'nemesis' (alien)
         self.board.drawnemesis()
         self.board.drawtimer(self.world.timeleft)
         self.board.drawtitle(self.title)
@@ -53,20 +54,22 @@ class Level(object):
         return True
 
     def handletime(self):
+        """Decrement the timer, handle if no time left"""
         self.world.timeleft -= 1
         self.board.drawtimer(self.world.timeleft)
         if self.world.timeleft == 0:
             self.outoftime()
 
     def outoftime(self):
+        """Out of time - laughter and then return to main menu"""
         if self.game.soundon:
             self.game.sfx['laugh'].play()        
         text1 = "OUT OF TIME"
         surf1 = self.game.menufont2.render(text1,True,WHITE)
+
         self.screen.blit(self.game.bim,(0,0))
         self.screen.blit(self.game.largenemesis,(172,200))
         self.screen.blit(surf1,(170,100))
-
         pygame.display.update()
         pygame.time.wait(3000)
         menu.Menu(self.game)
@@ -141,19 +144,20 @@ class Level(object):
                         self.handlemousedown(event.pos)
 
                     if event.type == MOUSEBUTTONUP:
-                        self.handlemouseup()#event.pos)
+                        self.handlemouseup()
 
         # we finished the level
         self.levelend()
 
-        # execution returns to world (see world.py)
+        # execution returns to __init__
         return
 
 class Cell(object):
     def __init__(self,celldata,ocol,icol,tcol):
-        """celldata is dict with key e.g. '34'"""
+        """celldata is dict with key that is 'xposypos' e.g. '34'"""
         key = celldata.keys()[0]
         self.key = key
+        # x and y index on grid (top left is (0,0))
         self.xpos = int(key[0])
         self.ypos = int(key[1])
         # current and solved states

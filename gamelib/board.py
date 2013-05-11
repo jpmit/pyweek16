@@ -3,9 +3,8 @@ import string
 from const import *
 
 class Board(object):
-    """Board is XCELLS*YCELLS (6x6), with a margin on all sides"""
-
     def __init__(self,game):
+        """Board is XCELLS*YCELLS (6x6), with a margin on all sides"""        
         self.game = game
         self.screen = game.screen 
         self.xmargin = (WINDOWWIDTH - XCELLS*CELLSIZE)/2
@@ -43,7 +42,7 @@ class Board(object):
         return cellx,celly
 
     def incircle(self,xpos,ypos,cellx,celly):
-        # check if we are within 'inner' circle
+        """Are we in inner circle of cell with index (cellx,celly)?"""
         xcell, ycell = self.getcellcenter(cellx,celly)
         if ((xpos - xcell)**2 + (ypos - ycell)**2) < self.crad2:
             return True
@@ -93,6 +92,7 @@ class Board(object):
 
     def drawcell(self,cell):
         """Draw a cell onto the board"""
+        
         # get top left and center co-ords of cell
         left, top = self.getlefttop(cell.xpos,cell.ypos)
 
@@ -162,22 +162,15 @@ class Board(object):
 
     def rotatecell(self,cell):
         """Rotate cell (clockwise)"""
-        # rotate the arrow positions
-        # to solve 'flickering' problems,
-        # try first of all drawing a cell with no arrows
-        self.drawcell(cell)
-        pygame.display.update()
-        self.game.clock.tick(FPS)
         if self.game.soundon:
             self.game.sfx['click'].play()
-        # then rotate the cell
         cell.rotate()
         self.drawcell(cell)
         pygame.display.update()
         self.game.clock.tick(FPS)        
 
     def rotateconnections(self,cells,cellkey):
-        """Rotate any cells in dict cells selconnected to cell with key cellkey"""
+        """Rotate any cells in dict cells connected to cell with key cellkey"""
         cell = cells[cellkey]
         for c in cell.conns:
             if c == 'u':

@@ -18,7 +18,7 @@ class Window(object):
         Game(self)
 
 class Game(object):
-
+    """Game class for launching game"""
     def __init__(self,window):
         self.screen = window.screen
 
@@ -28,7 +28,7 @@ class Game(object):
         # for controlling FPS
         self.clock = pygame.time.Clock()
                 
-        # game-wide fonts, sound effects, images
+        # load game-wide fonts, sound effects, images
         self.loadsounds()
         self.loadfonts()
         self.bim = pygame.image.load(data.filepath('back.png')).convert()
@@ -37,11 +37,8 @@ class Game(object):
 
         # create board
         self.board = board.Board(self)
-
-        # JPM - remove!!! this is for level testing
-        #world.World(self,1)
         
-        # intro screen        
+        # display menu screen        
         menu.Menu(self)
 
     def terminate(self):
@@ -70,6 +67,7 @@ class Game(object):
         self.menufont2 = pygame.font.Font(data.filepath('comicate.ttf'),40)
 
     def completed(self):
+        """Completed game, display message and return to main menu"""
         text1 = "GAME COMPLETE!"
         text2 = "CONGRATULATIONS"
         surf1 = self.menufont2.render(text1,True,WHITE)

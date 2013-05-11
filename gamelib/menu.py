@@ -6,29 +6,34 @@ import world
 import data
 
 class Menu(object):
+    """The menu is the first screen we get when we run the game"""
     def __init__(self,game):
         self.game = game
         self.screen = game.screen
         if game.soundon:
             pygame.mixer.music.load(data.filepath('menu.ogg'))
             pygame.mixer.music.play(-1)
-        # text position for title newgame, tutorial, worldselect
+            
+        # text position for title, newgame, tutorial, worldselect
         self.tposx, self.tposy = (100,100)
         self.nposx, self.nposy = (120,220)
         self.tutposx, self.tutposy = (120,320)
         self.sposx, self.sposy = (120,420)
+        
         # x and y offset to write world nums 1,2,..
         self.xoff = 30
         self.yoff = 50
-        # don't list world unless asked for
+        
+        # don't list worlds on menu unless asked for
         self.listw = False
         self.drawmenu()
         self.loop()
-
         
     def drawmenu(self):
         self.screen.blit(self.game.bim,(0,0))
-        # menu text, tsurf = title, nsurf = new game, ssurf = select
+
+        # menu text: tsurf = title, nsurf = new game,
+        # tutsurf = instruction, ssurf = select
         tsurf = self.game.menufont.render('Space Rotate',True,WHITE)
         nsurf = self.game.menufont2.render('New Game',True,WHITE)
         tutsurf = self.game.menufont2.render('Instructions',True,WHITE)        
@@ -43,7 +48,7 @@ class Menu(object):
         nrect = nsurf.get_rect()
         self.nrect = [nrect.top+self.nposy,nrect.left+self.nposx,
                       nrect.bottom+self.nposy,nrect.right+self.nposx]
-        # tutorial
+        # tutorial (instructions)
         tutrect = tutsurf.get_rect()
         self.tutrect = [tutrect.top+self.tutposy,tutrect.left+self.tutposx,
                       tutrect.bottom+self.tutposy,tutrect.right+self.tutposx]
@@ -63,7 +68,8 @@ class Menu(object):
             surf = self.game.menufont2.render(ws,True,WHITE)            
             rect = surf.get_rect()
             rectpos = [self.sposy + self.yoff,rect.left+self.sposx + xset*self.xoff,
-                       rect.bottom + self.sposy + self.yoff, rect.right + self.sposx + xset*self.xoff]
+                       rect.bottom + self.sposy + self.yoff,
+                       rect.right + self.sposx + xset*self.xoff]
             self.wrects.append(rectpos)
 
         # draw to the screen
@@ -74,6 +80,7 @@ class Menu(object):
         pygame.display.update()
 
     def inrect(self,mousex,mousey,rect):
+        """Return True if mouse click is inside rectangle, else False"""
         if mousex > rect[1] and mousex < rect[3]:
             if mousey > rect[0] and mousey < rect[2]:
                 return True
@@ -88,15 +95,16 @@ class Menu(object):
             pygame.time.wait(1000)
             self.startgame(1)
         if self.inrect(mousex,mousey,self.srect):
+            # display galaxies (worlds) to select from
             if self.listw == False:
                 self.game.sfx['newgame'].play()                
                 self.listworlds()
         if self.inrect(mousex,mousey,self.tutrect):
-            # clicked on 'controls'
+            # display instructions
             self.game.sfx['newgame'].play()
             self.controls()
         if self.listw == True:
-            # check if we clicked on one of the levels
+            # if we clicked on a galaxy (world) start game from there
             wc = self.wclicked((mousex,mousey))
             if wc:
                 self.game.sfx['newgame'].play()
@@ -125,12 +133,12 @@ class Menu(object):
         for (t,i) in zip(text,range(len(text))):
             surf = self.game.smallfont.render(t,True,WHITE)
             self.screen.blit(surf,(left,top+i*dy))
+            
         # draw a portal
         tcol = (255,255,255)
         # outer and inner circle colors
         outercol = (255,0,0)
         innercol = (112,0,0)
-        
         cell1 = level.Cell({'40': [[1, 0, 0, 0], [0, 1, 0, 1], []]},
                            outercol,innercol,tcol)
         cell2 = level.Cell({'41': [[1, 1, 0, 0], [0, 1, 0, 1], ['r']]},
@@ -140,6 +148,7 @@ class Menu(object):
         self.game.board.drawcell(cell1)
         self.game.board.drawcell(cell2)
         self.game.board.drawcell(cell3)         
+
         pygame.display.update()
         self.controlloop()
         self.drawmenu()
@@ -155,24 +164,23 @@ class Menu(object):
 
                 if event.type == KEYUP:
                     return
-                    #self.drawmenu()
-                    #self.loop()
 
     def wclicked(self,(mousex,mousey)):
         """If we clicked on a world, return world number, else None"""
         for w in range(self.game.nworlds):
             if self.inrect(mousex,mousey,self.wrects[w]):
                 return w+1
-        return None
         
     def listworlds(self):
         for w in range(1,self.game.nworlds+1):
             if w == self.game.nworlds:
+                # the last galaxy (world) is called bonus
                 wname = 'bonus'
             else:
                 wname = str(w)
             surf = self.game.menufont2.render(wname,True,WHITE)
-            self.screen.blit(surf, (self.sposx + w*self.xoff,self.sposy + self.yoff))
+            self.screen.blit(surf, (self.sposx + w*self.xoff,
+                                    self.sposy + self.yoff))
             pygame.display.update()
         self.listw = True
                 
@@ -190,4 +198,3 @@ class Menu(object):
 
     def startgame(self,worldnum):
         world.Worldloop(self.game,worldnum)
-
