@@ -59,12 +59,12 @@ class Game(object):
 
     def loadfonts(self):
         pygame.font.init()
-        self.timerfont = pygame.font.Font(data.filepath('comicate.ttf'),40)
         self.smallfont = pygame.font.Font(data.filepath('vera.ttf'),20)
-        self.levelnamefont = self.timerfont
-        self.worldnamefont = pygame.font.Font(data.filepath('comicate.ttf'),80)
+        self.timerfont = pygame.font.Font(data.filepath('comicate.ttf'),40)
         self.menufont = pygame.font.Font(data.filepath('comicate.ttf'),50)
-        self.menufont2 = pygame.font.Font(data.filepath('comicate.ttf'),40)
+        self.worldnamefont = pygame.font.Font(data.filepath('comicate.ttf'),80)        
+        self.levelnamefont = self.timerfont
+        self.menufont2 = self.timerfont
 
     def completed(self):
         """Completed game, display message and return to main menu"""
